@@ -1,25 +1,21 @@
 package com.example.kulinarymvvm.ui.fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
+import com.example.kulinarymvvm.data.db.FoodEntity;
 import com.example.kulinarymvvm.databinding.FragmentMainBinding;
+import com.example.kulinarymvvm.domain.adapters.FoodListAdapter;
 import com.example.kulinarymvvm.domain.viewmodels.FoodListViewModel;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
 
-import dagger.hilt.android.AndroidEntryPoint;
-import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory;
-import dagger.hilt.android.lifecycle.HiltViewModelExtensions;
-
-@AndroidEntryPoint
 public class MainFragment extends Fragment {
     FragmentMainBinding binding;
     FoodListViewModel viewModel;
@@ -41,6 +37,13 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentMainBinding.inflate(inflater);
+        ArrayList<FoodEntity> foodList = (ArrayList<FoodEntity>) viewModel.foodList.getValue();
+        if(foodList == null) {
+            foodList = new ArrayList<>();
+        }
+        FoodListAdapter adapter = new FoodListAdapter(foodList);
+        binding.foodListView.setAdapter(adapter);
+        binding.addFoodButton.setOnClickListener(v -> {});
         return binding.getRoot();
     }
 

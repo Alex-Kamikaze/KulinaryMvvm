@@ -2,7 +2,28 @@ package com.example.kulinarymvvm;
 
 import android.app.Application;
 
-import dagger.hilt.android.HiltAndroidApp;
+import androidx.room.Room;
 
-@HiltAndroidApp
-public class FoodApplication extends Application {}
+import com.example.kulinarymvvm.data.db.AppDatabase;
+
+public class FoodApplication extends Application {
+    private static FoodApplication Instance;
+    private AppDatabase db;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Instance = this;
+        db = Room.databaseBuilder(this, AppDatabase.class, "app.db")
+                .allowMainThreadQueries()
+                .build();
+    }
+
+    public static FoodApplication getInstance() {
+        return Instance;
+    }
+
+    public AppDatabase getDb() {
+        return db;
+    }
+}
