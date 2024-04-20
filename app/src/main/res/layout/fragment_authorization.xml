@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/introImage"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@drawable/splashscreenicon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/introText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Авторизуйтесь, чтобы пользоваться приложением"
+        android:textSize="24sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/introImage" />
+
+    <ImageView
+        android:id="@+id/fingerPrint"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/biometric_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/introText"
+        android:layout_marginTop="50dp"
+        />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
