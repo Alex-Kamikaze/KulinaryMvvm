@@ -12,6 +12,7 @@ import com.example.kulinarymvvm.data.db.FoodEntity;
 import com.example.kulinarymvvm.databinding.FoodListItemBinding;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class FoodListAdapter extends RecyclerView.Adapter<FoodListAdapter.ViewHolder> {
@@ -46,5 +47,10 @@ public class FoodListAdapter extends RecyclerView.Adapter<FoodListAdapter.ViewHo
             super(binding.getRoot());
             this.binding = binding;
         }
+    }
+
+    public void updateData(ArrayList<FoodEntity> newFood) {
+        this.foodList = newFood;
+        this.notifyDataSetChanged();
     }
 }

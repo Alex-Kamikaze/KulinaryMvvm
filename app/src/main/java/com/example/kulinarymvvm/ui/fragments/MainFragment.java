@@ -7,14 +7,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
+import com.example.kulinarymvvm.R;
 import com.example.kulinarymvvm.data.db.FoodEntity;
 import com.example.kulinarymvvm.databinding.FragmentMainBinding;
 import com.example.kulinarymvvm.domain.adapters.FoodListAdapter;
 import com.example.kulinarymvvm.domain.viewmodels.FoodListViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainFragment extends Fragment {
     FragmentMainBinding binding;
@@ -42,8 +46,13 @@ public class MainFragment extends Fragment {
             foodList = new ArrayList<>();
         }
         FoodListAdapter adapter = new FoodListAdapter(foodList);
+        viewModel.foodList.observe(getViewLifecycleOwner(), foodEntities -> {
+            adapter.updateData((ArrayList<FoodEntity>) foodEntities);
+        });
         binding.foodListView.setAdapter(adapter);
-        binding.addFoodButton.setOnClickListener(v -> {});
+        binding.addFoodButton.setOnClickListener(v -> {
+            Navigation.findNavController(binding.getRoot()).navigate(R.id.action_mainFragment_to_addFoodFragment);
+        });
         return binding.getRoot();
     }
 

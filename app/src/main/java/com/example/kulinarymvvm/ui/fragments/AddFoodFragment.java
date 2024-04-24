@@ -8,26 +8,33 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.example.kulinarymvvm.R;
+import com.example.kulinarymvvm.data.db.FoodCategoryEntity;
 import com.example.kulinarymvvm.data.db.FoodEntity;
 import com.example.kulinarymvvm.databinding.FragmentAddFoodBinding;
+import com.example.kulinarymvvm.domain.viewmodels.AddFoodViewModel;
+import com.example.kulinarymvvm.data.workers.SaveImageWorker;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AddFoodFragment extends Fragment {
     FragmentAddFoodBinding binding;
     FoodEntity newFoodItem = new FoodEntity();
+    AddFoodViewModel viewModel;
     public AddFoodFragment() {}
 
     public static AddFoodFragment newInstance() {
@@ -37,6 +44,7 @@ public class AddFoodFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(AddFoodViewModel.class);
     }
 
     @Override
@@ -48,16 +56,16 @@ public class AddFoodFragment extends Fragment {
             public void onActivityResult(Uri foodImage) {
                 if(foodImage != null) {
                     Picasso.get().load(foodImage).into(binding.foodImage);
-                    try {
-                        byte[] image = new byte[] {};
-                        requireContext().getContentResolver().openInputStream(foodImage).read(image);
-                        String newFileName = UUID.randomUUID() + ".jpg";
-                        File newImage = new File(requireContext().getFilesDir(), newFileName);
-                        new FileOutputStream(newImage).write(image);
-                        newFoodItem.setFoodImageUri(newImage.getPath());
-                    } catch (IOException e) {
-                        Toast.makeText(requireContext(), "Произошла ошибка при сохранении картинки: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                    String newFileName = UUID.randomUUID() + ".jpg";
+                    Data workerInput = new Data.Builder()
+                            .putString("image_uri", foodImage.toString())
+                            .putString("image_filename", newFileName)
+                            .build();
+                    OneTimeWorkRequest saveImageWork = new OneTimeWorkRequest.Builder(SaveImageWorker.class)
+                            .setInputData(workerInput)
+                            .build();
+                    WorkManager.getInstance(requireContext()).enqueue(saveImageWork);
+                    newFoodItem.setFoodImageUri(newFileName);
                 }
                 else {
                     binding.imageHint.setText("Ошибка: вы должны выбрать фотографию блюда!");
@@ -65,6 +73,31 @@ public class AddFoodFragment extends Fragment {
                 }
             }
         });
+
+        ArrayList<FoodCategoryEntity> categoryEntities = (ArrayList<FoodCategoryEntity>) viewModel.categories.getValue();
+        if(categoryEntities == null) {
+            categoryEntities = new ArrayList<>();
+        }
+        ArrayList<String> categories = new ArrayList<>();
+        categoryEntities.forEach(foodCategoryEntity -> {
+            categories.add(foodCategoryEntity.getCategoryName());
+        });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categories);
+
+        AdapterView.OnItemSelectedListener adapterListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedCategory = (String)adapterView.getItemAtPosition(i);
+                newFoodItem.setFoodCategoryId(viewModel.getCategoryByName(selectedCategory).getCategoryId());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        };
+
+        binding.categoryChooser.setAdapter(adapter);
+        binding.categoryChooser.setOnItemSelectedListener(adapterListener);
 
         binding.foodImage.setOnClickListener(v -> getFoodImagePicker.launch("image/*"));
         binding.saveButton.setOnClickListener(v -> {
@@ -78,7 +111,8 @@ public class AddFoodFragment extends Fragment {
             else {
                 newFoodItem.setFoodName(binding.foodNameInput.getText().toString());
                 newFoodItem.setFoodPrice(Integer.parseInt(binding.foodPriceInput.getText().toString()));
-
+                viewModel.addNewFood(newFoodItem);
+                Navigation.findNavController(binding.getRoot()).popBackStack();
             }
         });
 

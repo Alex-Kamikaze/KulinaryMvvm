@@ -5,8 +5,6 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-import com.google.android.material.circularreveal.CircularRevealHelper;
-
 @Entity(foreignKeys = {@ForeignKey(
         entity = FoodCategoryEntity.class,
         parentColumns = {"CategoryId"},

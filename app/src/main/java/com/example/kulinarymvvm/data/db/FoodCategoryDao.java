@@ -27,6 +27,11 @@ public interface FoodCategoryDao {
     @Query("SELECT * FROM foodcategoryentity WHERE CategoryId = :id")
     FoodCategoryEntity getCategoryById(int id);
 
+    //Для поиска по категориям
     @Query("SELECT * FROM foodcategoryentity WHERE categoryName LIKE :categoryName")
     LiveData<List<FoodCategoryEntity>> searchCategoryByName(String categoryName);
+
+    //Для получения конкретной категории
+    @Query("SELECT * FROM foodcategoryentity WHERE categoryName = :categoryName")
+    FoodCategoryEntity getCategoryByName(String categoryName);
 }

@@ -61,4 +61,6 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
+
+    implementation("androidx.work:work-runtime:2.9.0")
 }
