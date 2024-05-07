@@ -35,10 +35,8 @@ public class AddFoodViewModel extends ViewModel {
     public FoodCategoryEntity getCategoryByName(String categoryName) {
         return categoryDao.getCategoryByName(categoryName);
     }
-
-    public void saveFoodImage() {
-        Executor executor = runnable -> {
-
-        };
-    }
 }
+
+
+
+

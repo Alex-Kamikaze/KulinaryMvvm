@@ -58,7 +58,7 @@ public class AuthorizationFragment extends Fragment {
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Авторизация")
                 .setSubtitle("Авторизуйтесь, используя биометрию или пин код")
-                .setAllowedAuthenticators(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)
+                .setAllowedAuthenticators(allowedAuthenticators)
                 .build();
         Executor mainExecutor = requireActivity().getMainExecutor();
         BiometricPrompt authPrompt = new BiometricPrompt(this, mainExecutor, new BiometricPrompt.AuthenticationCallback() {

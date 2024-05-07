@@ -15,3 +15,4 @@ public class FoodListViewModel extends ViewModel {
 
     public LiveData<List<FoodEntity>> foodList = foodDao.getAllFood();
 }
+

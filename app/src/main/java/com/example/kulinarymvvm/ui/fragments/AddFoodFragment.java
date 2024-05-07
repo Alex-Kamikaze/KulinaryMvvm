@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -51,26 +52,27 @@ public class AddFoodFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentAddFoodBinding.inflate(inflater);
-        ActivityResultLauncher<String> getFoodImagePicker = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
-            @Override
-            public void onActivityResult(Uri foodImage) {
-                if(foodImage != null) {
-                    Picasso.get().load(foodImage).into(binding.foodImage);
-                    String newFileName = UUID.randomUUID() + ".jpg";
-                    Data workerInput = new Data.Builder()
-                            .putString("image_uri", foodImage.toString())
-                            .putString("image_filename", newFileName)
-                            .build();
-                    OneTimeWorkRequest saveImageWork = new OneTimeWorkRequest.Builder(SaveImageWorker.class)
-                            .setInputData(workerInput)
-                            .build();
-                    WorkManager.getInstance(requireContext()).enqueue(saveImageWork);
-                    newFoodItem.setFoodImageUri(newFileName);
-                }
-                else {
-                    binding.imageHint.setText("Ошибка: вы должны выбрать фотографию блюда!");
-                    binding.imageHint.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                }
+        ActivityResultLauncher<String> getFoodImagePicker = registerForActivityResult(new ActivityResultContracts.GetContent(), foodImage -> {
+            if(foodImage != null) {
+                Picasso.get().load(foodImage).into(binding.foodImage);
+                String newFileName = UUID.randomUUID() + ".jpg";
+                Data workerInput = new Data.Builder()
+                        .putString("image_uri", foodImage.toString())
+                        .putString("image_filename", newFileName)
+                        .build();
+                Constraints workerConstraints = new Constraints.Builder()
+                        .setRequiresStorageNotLow(true)
+                        .build();
+                OneTimeWorkRequest saveImageWork = new OneTimeWorkRequest.Builder(SaveImageWorker.class)
+                        .setInputData(workerInput)
+                        .setConstraints(workerConstraints)
+                        .build();
+                WorkManager.getInstance(requireContext()).enqueue(saveImageWork);
+                newFoodItem.setFoodImageUri(newFileName);
+            }
+            else {
+                binding.imageHint.setText("Ошибка: вы должны выбрать фотографию блюда!");
+                binding.imageHint.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             }
         });
 
