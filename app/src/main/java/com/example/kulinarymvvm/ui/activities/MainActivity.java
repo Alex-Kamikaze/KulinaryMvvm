@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -25,3 +25,4 @@ public class MainActivity extends AppCompatActivity {
         return Navigation.findNavController(binding.getRoot()).navigateUp();
     }
 }
+
